@@ -5,5 +5,5 @@ Dateinamen und Inhalte werden auf dem Server verschlüsselt gespeichert. Der Sch
 
 ## ToDo
 
-Cronjob auf cron.php
-
+- Cronjob auf cron.php
+- impressum.html anlegen
