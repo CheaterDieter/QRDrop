@@ -16,5 +16,15 @@ Thumbs.db
 # Impressum und Datenschutzerklärung - diese Dateien können sensible Informationen enthalten
 impressum.html
 
-# Datenbank
-db/qrdrop.db
+# config
+config.php
+
+# Uploads - alles ignorieren außer .htaccess und index.html
+uploads/*
+!uploads/.htaccess
+!uploads/index.html
+
+# db - alles ignorieren außer .htaccess und index.html
+db/*
+!db/.htaccess
+!db/index.html

@@ -37,8 +37,7 @@ function handleFileSelect(file) {
         if (n.endsWith('.pdf') || n.endsWith('.jpg') || n.endsWith('.jpeg') || n.endsWith('.png') || n.endsWith('.zip')) ok = true;
     }
     if (!ok) { showError('Nur PDF-, Bilder (.jpg, .jpeg, .png) oder ZIP-Dateien sind erlaubt!'); return; }
-    const maxSize = 50 * 1024 * 1024;
-    if (file.size > maxSize) { showError('Datei ist zu groß! Maximum: 50MB'); return; }
+    if (file.size > MAX_FILE_SIZE) { showError('Datei ist zu groß! Maximum: ' + Math.round(MAX_FILE_SIZE / 1024 / 1024) + 'MB'); return; }
     selectedFile = file;
     fileName.textContent = file.name;
     fileSize.textContent = formatFileSize(file.size);
@@ -56,7 +55,7 @@ async function uploadFile() {
         const response = await fetch('upload.php', { method: 'POST', body: formData });
         const text = await response.text(); let data;
         try { data = JSON.parse(text); } catch (parseError) { showError('Server-Fehler: Ungültige Antwort'); uploadButton.disabled = false; loading.classList.remove('show'); return; }
-        if (data.success) { displayResult(data); uploadForm.style.display = 'none'; result.classList.add('show'); startExpiresCountdown(); } else { showError(data.error || 'Fehler beim Hochladen'); uploadButton.disabled = false; }
+        if (data.success) { hideError(); displayResult(data); uploadForm.style.display = 'none'; result.classList.add('show'); startExpiresCountdown(); } else { showError(data.error || 'Fehler beim Hochladen'); uploadButton.disabled = false; }
     } catch (err) { showError('Fehler beim Hochladen: ' + err.message); uploadButton.disabled = false; } finally { loading.classList.remove('show'); }
 }
 

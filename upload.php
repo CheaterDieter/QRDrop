@@ -1,4 +1,20 @@
 <?php
+if (file_exists(__DIR__ . '/config.php')) {
+    require_once __DIR__ . '/config.php';
+} else {
+    require_once __DIR__ . '/config-sample.php';
+}
+
+// PHP-Limits basierend auf MAX_FILE_SIZE erhöhen
+$maxFileSizeMB = ceil(MAX_FILE_SIZE / 1024 / 1024) + 10; // +10 MB Puffer
+ini_set('upload_max_filesize', $maxFileSizeMB . 'M');
+ini_set('post_max_size', $maxFileSizeMB . 'M');
+ini_set('memory_limit', max(256, $maxFileSizeMB + 50) . 'M'); // Mindestens 256M
+ini_set('max_execution_time', 600); // 10 Minuten für große Uploads
+
+// Feste Aufbewahrungszeiten (in Minuten)
+$allowedRetentionTimes = [10, 60, 720];
+
 ob_start();
 header('Content-Type: application/json; charset=utf-8');
 ini_set('display_errors', '0');
@@ -47,16 +63,7 @@ try {
     }
 
     if (!isset($_FILES['file'])) {
-        respond(false, ['error' => 'No file uploaded'], 400);
-    }
-
-    // Get retention time from request (default: 10 minutes)
-    $retentionTime = 10; // default
-    if (isset($_POST['retention_time'])) {
-        $rt = intval($_POST['retention_time']);
-        if ($rt === 60 || $rt === 720) {
-            $retentionTime = $rt;
-        }
+        respond(false, ['error' => 'Keine Datei hochgeladen'], 400);
     }
     if ($_FILES['file']['error'] !== UPLOAD_ERR_OK) {
         $code = (int)$_FILES['file']['error'];
@@ -64,25 +71,37 @@ try {
         switch ($code) {
             case UPLOAD_ERR_INI_SIZE:
             case UPLOAD_ERR_FORM_SIZE:
-                $msg = 'File too large';
+                // Hilfreich: Zeige die aktuellen PHP-Limits
+                $upload_max = ini_get('upload_max_filesize');
+                $post_max = ini_get('post_max_size');
+                $msg = 'Datei zu groß! Aktuelles Limit: ' . $post_max . ' (upload_max_filesize: ' . $upload_max . ', post_max_size: ' . $post_max . ')';
                 break;
             case UPLOAD_ERR_PARTIAL:
-                $msg = 'File only partially uploaded';
+                $msg = 'Datei nur teilweise hochgeladen (Verbindung unterbrochen?)';
                 break;
             case UPLOAD_ERR_NO_FILE:
-                $msg = 'No file sent';
+                $msg = 'Keine Datei gesendet';
                 break;
             case UPLOAD_ERR_NO_TMP_DIR:
-                $msg = 'Missing temporary folder on server';
+                $msg = 'Temp-Verzeichnis fehlt auf Server';
                 break;
             case UPLOAD_ERR_CANT_WRITE:
-                $msg = 'Failed to write file to disk';
+                $msg = 'Datei-Schreib-Fehler';
                 break;
             case UPLOAD_ERR_EXTENSION:
-                $msg = 'A PHP extension stopped the file upload';
+                $msg = 'PHP-Extension hat Upload gestoppt';
                 break;
         }
         respond(false, ['error' => $msg], 400);
+    }
+
+    // Get retention time from request (default: 10 minutes)
+    $retentionTime = 10; // default
+    if (isset($_POST['retention_time'])) {
+        $rt = intval($_POST['retention_time']);
+        if (in_array($rt, $allowedRetentionTimes)) {
+            $retentionTime = $rt;
+        }
     }
 
     $file = $_FILES['file'];
@@ -123,13 +142,13 @@ try {
         }
     }
 
-    if ($file['size'] > 52428800) {
+    if ($file['size'] > MAX_FILE_SIZE) {
         respond(false, ['error' => 'Too large'], 400);
     }
 
-    // Check if upload directory size exceeds 5 GB limit
+    // Check if upload directory size exceeds limit
     $currentDirSize = getDirSize($uploadDir);
-    $maxDirSize = 5 * 1024 * 1024 * 1024; // 5 GB in bytes
+    $maxDirSize = MAX_STORAGE_SIZE;
     if ($currentDirSize >= $maxDirSize) {
         respond(false, ['error' => 'Speicherlimit erreicht. Bitte versuchen Sie es später erneut.'], 507);
     }

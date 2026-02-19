@@ -1,6 +1,11 @@
 <?php
 define('APP_VERSION', '1.1.0'); // App-Version
 
+if (file_exists(__DIR__ . '/config.php')) {
+    require_once __DIR__ . '/config.php';
+} else {
+    require_once __DIR__ . '/config-sample.php';
+}
 
 ob_start();
 
@@ -185,6 +190,7 @@ $color3 = "hsl($hue3, 32%, 48%)";
                 <div class="upload-icon">📤</div>
                 <div class="upload-text">PDF, Bild (.jpg, .jpeg, .png) oder ZIP-Datei hier ablegen</div>
                 <div class="upload-subtext">oder zum Auswählen klicken</div>
+                <div class="upload-limit">max. <?php echo round(MAX_FILE_SIZE / 1024 / 1024); ?> MB</div>
                 <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.zip" />
             </div>
 
@@ -256,6 +262,10 @@ $color3 = "hsl($hue3, 32%, 48%)";
     </div>
 
     <div class="version-info">v<?php echo APP_VERSION; ?> | <a href="#" id="aboutLink">About</a> | <a href="#" id="impressumLink">Impressum und Datenschutz</a></div>
+    <script>
+        // Maximale Dateigröße (in Bytes) von config.php
+        const MAX_FILE_SIZE = <?php echo MAX_FILE_SIZE; ?>;
+    </script>
     <script src="qrcode.min.js"></script>
     <script src="app.js?v=<?php echo filemtime(__DIR__ . '/app.js'); ?>"></script>
 </body>
