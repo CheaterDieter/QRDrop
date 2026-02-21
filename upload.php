@@ -5,6 +5,42 @@ if (file_exists(__DIR__ . '/config.php')) {
     require_once __DIR__ . '/config-sample.php';
 }
 
+$hostHeader = $_SERVER['HTTP_HOST'] ?? '';
+$requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+$parts = explode(':', $hostHeader, 2);
+$hostName = $parts[0];
+$hostPort = isset($parts[1]) ? ':' . $parts[1] : '';
+$isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443)
+    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
+
+if ($hostName !== '') {
+    $targetHost = $hostName;
+    $targetScheme = $isHttps ? 'https' : 'http';
+
+    if (defined('FORCE_HTTPS') && FORCE_HTTPS) {
+        $targetScheme = 'https';
+    }
+
+    if (defined('CANONICAL_HOST') && CANONICAL_HOST !== '') {
+        $isIp = filter_var($hostName, FILTER_VALIDATE_IP);
+        $isLocalhost = strtolower($hostName) === 'localhost';
+        if (!$isIp && !$isLocalhost) {
+            $lowerHost = strtolower($hostName);
+            if (CANONICAL_HOST === 'www' && strpos($lowerHost, 'www.') !== 0) {
+                $targetHost = 'www.' . $hostName;
+            } elseif (CANONICAL_HOST === 'non-www' && strpos($lowerHost, 'www.') === 0) {
+                $targetHost = substr($hostName, 4);
+            }
+        }
+    }
+
+    if ($targetHost !== $hostName || $targetScheme !== ($isHttps ? 'https' : 'http')) {
+        header('Location: ' . $targetScheme . '://' . $targetHost . $hostPort . $requestUri, true, 308);
+        exit;
+    }
+}
+
 // PHP-Limits basierend auf MAX_FILE_SIZE erhöhen
 $maxFileSizeMB = ceil(MAX_FILE_SIZE / 1024 / 1024) + 10; // +10 MB Puffer
 ini_set('upload_max_filesize', $maxFileSizeMB . 'M');

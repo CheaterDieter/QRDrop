@@ -1,6 +1,6 @@
 <?php
 /**
- * Anpassung der Dateigrößenlimits
+ * Anpassung der Dateigrößenlimits und weiterer Einstellungen
  */
 
 // Maximale Dateigröße pro Upload (in Bytes)
@@ -12,4 +12,12 @@ define('MAX_FILE_SIZE', 50 * 1024 * 1024);
 // Maximales Speicherlimit für das uploads/ Verzeichnis (in Bytes)
 // Standard: 5 GB
 define('MAX_STORAGE_SIZE', 5 * 1024 * 1024 * 1024);
+
+// Canonical-Host-Weiterleitung (leerer String deaktiviert)
+// Mögliche Werte: '', 'www', 'non-www'
+define('CANONICAL_HOST', '');
+
+// HTTPS-Umleitung erzwingen
+// true = immer auf https umleiten (sofern verfuegbar)
+define('FORCE_HTTPS', false);
 ?>

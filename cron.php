@@ -38,6 +38,7 @@ $summary = [
     'deleted_files' => [],
     'deleted_db' => [],
     'deleted_orphans' => [],
+    'deleted_missing_db' => [],
     'errors' => [],
 ];
 
@@ -94,6 +95,18 @@ try {
         }
     }
 
+    // Clean up DB entries for missing files
+    $stmt = $db->query("SELECT id, file_path FROM files");
+    $dbFiles = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+    foreach ($dbFiles as $row) {
+        $full = rtrim(UPLOAD_DIR, '\\/') . DIRECTORY_SEPARATOR . $row['file_path'];
+        if (!file_exists($full)) {
+            $deleteStmt = $db->prepare("DELETE FROM files WHERE id = ?");
+            $deleteStmt->execute([$row['id']]);
+            $summary['deleted_missing_db'][] = $row['id'];
+        }
+    }
+
     // Get all files for statistics only
     $stmt = $db->query("SELECT COUNT(*) FROM files");
     $totalFiles = $stmt ? $stmt->fetchColumn() : 0;
@@ -114,6 +127,7 @@ try {
     echo "- Expired files deleted: " . count($summary['deleted_files']) . "\n";
     echo "- DB entries removed: " . count($summary['deleted_db']) . "\n";
     echo "- Orphaned files deleted: " . count($summary['deleted_orphans']) . "\n";
+    echo "- DB entries without file removed: " . count($summary['deleted_missing_db']) . "\n";
     
     if (count($summary['errors']) > 0) {
         echo "\nErrors (" . count($summary['errors']) . "):\n";
