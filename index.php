@@ -1,5 +1,5 @@
 <?php
-define('APP_VERSION', '1.1.1'); // App-Version
+define('APP_VERSION', '1.1.2'); // App-Version
 
 if (file_exists(__DIR__ . '/config.php')) {
     require_once __DIR__ . '/config.php';
