@@ -27,14 +27,14 @@ retentionRadios.forEach(radio => {
 });
 
 function handleFileSelect(file) {
-    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'application/zip', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'application/zip'];
     let ok = false;
     if (file.type && allowedTypes.includes(file.type)) {
         ok = true;
     } else {
         // fallback: check file extension when MIME type is missing/incorrect
         const n = (file.name || '').toLowerCase();
-        if (n.endsWith('.pdf') || n.endsWith('.jpg') || n.endsWith('.jpeg') || n.endsWith('.png') || n.endsWith('.zip') || n.endsWith('.docx')) ok = true;
+        if (n.endsWith('.pdf') || n.endsWith('.jpg') || n.endsWith('.jpeg') || n.endsWith('.png') || n.endsWith('.zip')) ok = true;
     }
     if (!ok) { showError('Nur PDF-, Bilder (.jpg, .jpeg, .png) oder ZIP-Dateien sind erlaubt!'); return; }
     if (file.size > MAX_FILE_SIZE) { showError('Datei ist zu groß! Maximum: ' + Math.round(MAX_FILE_SIZE / 1024 / 1024) + 'MB'); return; }
