@@ -145,13 +145,13 @@ try {
     if (!is_uploaded_file($file['tmp_name'])) {
         respond(false, ['error' => 'Temporary upload file not recognized'], 400);
     }
-    // read initial bytes to detect file type (PDF, JPEG, PNG, ZIP)
+    // read initial bytes to detect file type (PDF, JPEG, PNG, ZIP, DOCX)
     $magic = @file_get_contents($file['tmp_name'], false, null, 0, 8);
     if ($magic === false) {
         respond(false, ['error' => 'Unable to read upload'], 500);
     }
 
-    $detected = null; // one of: pdf, jpg, png, zip
+    $detected = null; // one of: pdf, jpg, png, zip, docx
     if (substr($magic, 0, 4) === "%PDF") {
         $detected = 'pdf';
     } elseif (substr($magic, 0, 3) === "\xFF\xD8\xFF" || substr($magic, 0, 2) === "\xFF\xD8") {
@@ -159,7 +159,9 @@ try {
     } elseif ($magic === "\x89PNG\r\n\x1A\n" || substr($magic, 0, 4) === "\x89PNG") {
         $detected = 'png';
     } elseif (substr($magic, 0, 4) === "PK\x03\x04") {
-        $detected = 'zip';
+        // Both ZIP and DOCX share the PK magic bytes – differentiate by file extension
+        $uploadExt = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $detected = ($uploadExt === 'docx') ? 'docx' : 'zip';
     } else {
         respond(false, ['error' => 'Ungültiger Dateityp'], 400);
     }
@@ -171,7 +173,8 @@ try {
             'pdf' => ['application/pdf'],
             'jpg' => ['image/jpeg', 'image/pjpeg'],
             'png' => ['image/png', 'image/x-png'],
-            'zip' => ['application/zip', 'application/x-zip-compressed']
+            'zip' => ['application/zip', 'application/x-zip-compressed'],
+            'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip', 'application/x-zip-compressed', 'application/x-zip', 'application/msword']
         ];
         if (!isset($mimeMap[$detected]) || !in_array($mime, $mimeMap[$detected], true)) {
             respond(false, ['error' => 'MIME-Typ stimmt nicht mit Datei überein'], 400);
@@ -296,7 +299,7 @@ try {
     }
 
     // filename is: <fileId>_<randomHex>.<ext> (no timestamp)
-    $ext = ($detected === 'jpg') ? 'jpg' : (($detected === 'png') ? 'png' : (($detected === 'zip') ? 'zip' : 'pdf'));
+    $ext = ($detected === 'jpg') ? 'jpg' : (($detected === 'png') ? 'png' : (($detected === 'zip') ? 'zip' : (($detected === 'docx') ? 'docx' : 'pdf')));
     $storedName = $fileId . '_' . $randomHex . '.' . $ext;
     $filePath = $uploadDir . '/' . $storedName;
 

@@ -162,6 +162,9 @@ try {
                 case 'zip':
                     $ctype = 'application/zip';
                     break;
+                case 'docx':
+                    $ctype = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+                    break;
                 default:
                     $ctype = 'application/octet-stream';
             }
@@ -212,7 +215,7 @@ $color3 = "hsl($hue3, 32%, 48%)";
 <body style="--bg-color1: <?php echo $color1; ?>; --bg-color2: <?php echo $color2; ?>; --bg-color3: <?php echo $color3; ?>">
     <!-- UI is provided by app.js and index markup below -->
     <div class="container">
-        <p class="subtitle">PDF, Bild (JPG/PNG) oder ZIP-Datei hochladen und QR-Code zum Teilen generieren</p>
+        <p class="subtitle">PDF, Bild (JPG/PNG), ZIP- oder DOCX-Datei hochladen und QR-Code zum Teilen generieren</p>
 
         <div class="error" id="error"></div>
         <div class="success" id="success"></div>
@@ -224,10 +227,10 @@ $color3 = "hsl($hue3, 32%, 48%)";
         <div id="uploadForm">
             <div class="upload-area" id="uploadArea">
                 <div class="upload-icon">📤</div>
-                <div class="upload-text">PDF, Bild (.jpg, .jpeg, .png) oder ZIP-Datei hier ablegen</div>
+                <div class="upload-text">PDF, Bild (.jpg, .jpeg, .png), ZIP- oder DOCX-Datei hier ablegen</div>
                 <div class="upload-subtext">oder zum Auswählen klicken</div>
                 <div class="upload-limit">max. <?php echo round(MAX_FILE_SIZE / 1024 / 1024); ?> MB</div>
-                <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.zip" />
+                <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.zip,.docx" />
             </div>
 
             <div class="file-info" id="fileInfo">
