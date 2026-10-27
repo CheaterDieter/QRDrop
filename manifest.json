@@ -1,0 +1,39 @@
+{
+  "name": "QRdrop - Dateien hochladen & teilen",
+  "short_name": "QRdrop",
+  "description": "PDF, Bild oder ZIP-Datei schnell hochladen und per QR-Code teilen.",
+  "start_url": "./index.php",
+  "scope": "./",
+  "id": "./index.php",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#2b2b55",
+  "theme_color": "#4d4db0",
+  "lang": "de",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -28,3 +28,6 @@ uploads/*
 db/*
 !db/.htaccess
 !db/index.html
+
+# mysql-DB ignoren
+mysql*

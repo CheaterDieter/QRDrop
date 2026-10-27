@@ -1,5 +1,5 @@
 <?php
-define('APP_VERSION', '1.1.1'); // App-Version
+define('APP_VERSION', '1.2'); // App-Version
 
 if (file_exists(__DIR__ . '/config.php')) {
     require_once __DIR__ . '/config.php';
@@ -205,9 +205,20 @@ $color3 = "hsl($hue3, 32%, 48%)";
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>QRdrop - Dateien hochladen & teilen</title>
     <link rel="stylesheet" href="app.css" />
+
+    <!-- PWA / "Zum Home-Bildschirm hinzufügen" -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4d4db0">
+    <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+
+    <!-- iOS-spezifisch (Safari ignoriert manifest.json teilweise) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="QRdrop">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 </head>
 <body style="--bg-color1: <?php echo $color1; ?>; --bg-color2: <?php echo $color2; ?>; --bg-color3: <?php echo $color3; ?>">
     <!-- UI is provided by app.js and index markup below -->
